@@ -3,9 +3,11 @@
 	"version": "1.0.0",
 	"description": "Utilidades para el proyecto de investigación de GPI",
 	"main": "lib/index.js",
+	"types": "lib/index.d.ts",
 	"scripts": {
 		"lint": "eslint . --ext .ts",
-		"build": "tsc --project ./"
+		"build": "tsc --project ./",
+		"postinstall": "tsc --project ./"
 	},
 	"repository": {
 		"type": "git",
