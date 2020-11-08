@@ -43,14 +43,14 @@ export function deepObjectCompare(...o: { [key: string]: any }[]): boolean {
 	}
 	function iter(cO: { [key: string]: any }, array: any[]) {
 		Object.keys(cO).forEach((k) => {
-			if (cO[k] !== null && typeof cO[k] === "object") {
+			if (cO[k] !== null && typeof cO[k] === 'object') {
 				iter(cO[k], array);
 				return;
 			}
 			array.push(cO[k]);
 		});
 	}
-	let state: boolean = true;
+	let state = true;
 	o.reduce((prev, obj) => {
 		const a: any[] = [];
 		const b: any[] = [];
@@ -62,9 +62,11 @@ export function deepObjectCompare(...o: { [key: string]: any }[]): boolean {
 	return state;
 }
 export function isObject(obj: any): boolean {
-	return obj && typeof obj === "object";
+	return obj && typeof obj === 'object';
 }
-export function objAssignDeep<T extends { [key: string]: any } = { [key: string]: any }>(...objs: T[]): T {
+export function objAssignDeep<T extends { [key: string]: any } = { [key: string]: any }>(
+	...objs: T[]
+): T {
 	return objs.reduce((prev: { [key: string]: any }, obj: { [key: string]: any }) => {
 		Object.keys(obj).forEach((key) => {
 			const pVal: any = prev[key];
@@ -80,7 +82,9 @@ export function objAssignDeep<T extends { [key: string]: any } = { [key: string]
 		return prev;
 	}, {}) as any;
 }
-export function objAssignDeepClearArray<T extends { [key: string]: any } = { [key: string]: any }>(...objs: T[]): T {
+export function objAssignDeepClearArray<T extends { [key: string]: any } = { [key: string]: any }>(
+	...objs: T[]
+): T {
 	return objs.reduce((prev: { [key: string]: any }, obj: { [key: string]: any }) => {
 		Object.keys(obj).forEach((key) => {
 			const pVal: any = prev[key];
@@ -109,15 +113,17 @@ export function objMap<O>(obj: O, fn: any) {
 }
 export function queryNormalize(query: { [key: string]: string }) {
 	return (
-		"?" +
+		'?' +
 		Object.entries(query)
 			.filter((q) => q[1])
 			.map((q) => `${q[0]}=${encodeURI(q[1])}`)
-			.join("&")
+			.join('&')
 	);
 }
 export function random(min: number, max: number, include: boolean = false): number {
-	return include ? Math.floor(Math.random() * (max - min + 1)) + min : Math.floor(Math.random() * (max - min)) + min;
+	return include
+		? Math.floor(Math.random() * (max - min + 1)) + min
+		: Math.floor(Math.random() * (max - min)) + min;
 }
 export function timeout(miliseconds: number) {
 	return new Promise((r) => {
