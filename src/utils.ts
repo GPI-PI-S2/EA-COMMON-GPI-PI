@@ -6,21 +6,26 @@
  * @param  key common key to make the join
  * @returns array
  */
-export function arrayLeftOuterJoin<T extends any>(array1: T[], array2: T[], key?: keyof T) {
-	const map: any = {};
+export function arrayLeftOuterJoin<T extends unknown>(
+	array1: T[],
+	array2: T[],
+	key?: keyof T,
+): T[] {
+	const map: Record<string, unknown> = {};
 	for (const elem of array2) {
-		const _e = key ? elem[key] : elem;
+		const _e = (key ? elem[key] : elem) as string | number;
 		map[_e] = 1;
 	}
-	const result: any = [];
+	const result: T[] = [];
 	for (let i = 0; i < array1.length; i++) {
-		const _e = key ? (array1 as any)[i][key] : array1[i];
-		if (!(_e in map)) {
+		const _e = key ? array1[i][key] : array1[i];
+		if (!((_e as string | number) in map)) {
 			result.push(array1[i]);
 		}
 	}
 	return result;
 }
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const debounce = <F extends (...args: any[]) => any>(func: F, waitFor: number) => {
 	let cTimeout: NodeJS.Timeout;
 	return (...args: Parameters<F>): Promise<ReturnType<F>> =>
@@ -32,8 +37,8 @@ export const debounce = <F extends (...args: any[]) => any>(func: F, waitFor: nu
 			cTimeout = setTimeout(() => resolve(func(...args)), waitFor);
 		});
 };
-export function deepObjectCompare(...o: { [key: string]: any }[]): boolean {
-	function arraysIdentical(a: any[], b: any[]) {
+export function deepObjectCompare<T extends Record<string, unknown>>(...o: T[]): boolean {
+	function arraysIdentical(a: unknown[], b: unknown[]) {
 		let i = a.length;
 		if (i !== b.length) return false;
 		while (i--) {
@@ -41,7 +46,7 @@ export function deepObjectCompare(...o: { [key: string]: any }[]): boolean {
 		}
 		return true;
 	}
-	function iter(cO: { [key: string]: any }, array: any[]) {
+	function iter(cO: unknown, array: T[keyof T][]) {
 		Object.keys(cO).forEach((k) => {
 			if (cO[k] !== null && typeof cO[k] === 'object') {
 				iter(cO[k], array);
@@ -52,8 +57,8 @@ export function deepObjectCompare(...o: { [key: string]: any }[]): boolean {
 	}
 	let state = true;
 	o.reduce((prev, obj) => {
-		const a: any[] = [];
-		const b: any[] = [];
+		const a: T[keyof T][] = [];
+		const b: T[keyof T][] = [];
 		iter(prev, a);
 		iter(obj, b);
 		if (!arraysIdentical(a, b)) state = false;
@@ -61,44 +66,49 @@ export function deepObjectCompare(...o: { [key: string]: any }[]): boolean {
 	});
 	return state;
 }
-export function isObject(obj: any): boolean {
+export function isObject(obj: Record<string, unknown>): boolean {
 	return obj && typeof obj === 'object';
 }
-export function objAssignDeep<T extends { [key: string]: any } = { [key: string]: any }>(
-	...objs: T[]
-): T {
-	return objs.reduce((prev: { [key: string]: any }, obj: { [key: string]: any }) => {
+export function objAssignDeep<T extends unknown>(...objs: T[]): T {
+	return objs.reduce((prev, obj) => {
 		Object.keys(obj).forEach((key) => {
-			const pVal: any = prev[key];
-			const oVal: any = obj[key];
+			// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+			const pVal = prev[key];
+			// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+			const oVal = obj[key];
 			if (Array.isArray(pVal) && Array.isArray(oVal)) {
 				prev[key] = pVal.concat(...oVal);
 			} else if (isObject(pVal) && isObject(oVal)) {
+				// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 				prev[key] = objAssignDeep(pVal, oVal);
 			} else {
+				// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 				prev[key] = oVal;
 			}
 		});
 		return prev;
-	}, {}) as any;
+	}, {} as T);
 }
-export function objAssignDeepClearArray<T extends { [key: string]: any } = { [key: string]: any }>(
-	...objs: T[]
-): T {
-	return objs.reduce((prev: { [key: string]: any }, obj: { [key: string]: any }) => {
+export function objAssignDeepClearArray<T extends unknown>(...objs: T[]): T {
+	return objs.reduce((prev, obj) => {
 		Object.keys(obj).forEach((key) => {
-			const pVal: any = prev[key];
-			const oVal: any = obj[key];
+			// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+			const pVal = prev[key];
+			// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+			const oVal = obj[key];
 			if (Array.isArray(pVal) && Array.isArray(oVal)) {
+				// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 				prev[key] = [...oVal];
 			} else if (isObject(pVal) && isObject(oVal)) {
+				// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 				prev[key] = objAssignDeepClearArray(pVal, oVal);
 			} else {
+				// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 				prev[key] = oVal;
 			}
 		});
 		return prev;
-	}, {}) as any;
+	}, {} as T);
 }
 /**
  * Clone object without observers
@@ -108,7 +118,10 @@ export function objAssignDeepClearArray<T extends { [key: string]: any } = { [ke
 export function objClone<T>(obj: T): T {
 	return JSON.parse(JSON.stringify(obj));
 }
-export function objMap<O>(obj: O, fn: any) {
+export function objMap<O extends Record<string, unknown>>(
+	obj: O,
+	fn: <T extends unknown>(arg0: T, arg1: string, arg2: number) => T,
+) {
 	return Object.fromEntries(Object.entries(obj).map(([k, v], i) => [k, fn(v, k, i)]));
 }
 export function queryNormalize(query: { [key: string]: string }) {
@@ -120,12 +133,17 @@ export function queryNormalize(query: { [key: string]: string }) {
 			.join('&')
 	);
 }
-export function random(min: number, max: number, include: boolean = false): number {
+/**
+ * @param {number} min from (include)
+ * @param {number} max to (exclude)
+ * @param {boolean} [include=false] Include max
+ */
+export function random(min: number, max: number, include = false): number {
 	return include
 		? Math.floor(Math.random() * (max - min + 1)) + min
 		: Math.floor(Math.random() * (max - min)) + min;
 }
-export function timeout(miliseconds: number) {
+export function timeout(miliseconds: number): Promise<void> {
 	return new Promise((r) => {
 		setTimeout(() => r(), miliseconds);
 	});
