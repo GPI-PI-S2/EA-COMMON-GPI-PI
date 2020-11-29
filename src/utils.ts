@@ -66,7 +66,7 @@ export function deepObjectCompare<T extends Record<string, unknown>>(...o: T[]):
 	});
 	return state;
 }
-export function isObject(obj: Record<string, unknown>): boolean {
+export function isObject(obj: unknown): boolean {
 	return obj && typeof obj === 'object';
 }
 export function objAssignDeep<T extends unknown>(...objs: T[]): T {
