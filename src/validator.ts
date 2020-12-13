@@ -225,10 +225,8 @@ export function vNickname(scope?: Validator.Scope): Validator.fn {
 }
 export function arrayValidation(input: string, functions: Validator.fn[]): boolean | string {
 	let error: string = '';
-	console.warn('input', input);
 	const hasError = functions.some((validationFn) => {
 		const validateResponse = validationFn(input);
-		console.warn('test', input, validateResponse);
 		if (typeof validateResponse === 'string') {
 			error = validateResponse;
 			return true;
